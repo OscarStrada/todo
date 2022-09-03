@@ -2,38 +2,49 @@ const express = require('express')
 const router = express.Router()
 const Todo = require('../models/Todo')
 
+// Get all todos
 router.get('/', async (req, res) => {
   const todos = await Todo.find()
   return res.json(todos)
 })
 
-router.post('/new', (req, res) => {
-  const todo = new Todo({
+// Create a new todo
+router.post('/', async (req, res) => {
+  let todo = new Todo({
     text: req.body.text
   })
 
-  todo.save()
+  todo = await todo.save()
   return res.json(todo)
 })
 
-router.delete('/delete/:id', async (req, res) => {
-  const result = await Todo.findByIdAndDelete(req.params.id)
-  return res.json({ result })
+// Delete todo by id
+router.delete('/:id', async (req, res) => {
+  const todo = await Todo.findByIdAndDelete(req.params.id)
+  if (!todo) return res.status(404).send('The todo was not found')
+
+  return res.json({ todo })
 })
 
+// Get todos completed
 router.get('/complete/:id', async (req, res) => {
   const todo = await Todo.findById(req.params.id)
+  if (!todo) return res.status(404).send('The todo was not found')
 
   todo.complete = !todo.complete
   todo.save()
   return res.json(todo)
 })
 
-router.put('/update/:id', async (req, res) => {
-  const todo = await Todo.findById(req.params.id)
+router.put('/:id', async (req, res) => {
+  const todo = await Todo.findByIdAndUpdate(req.params.id,
+    {
+      text: req.body.text,
+      complete: req.body.complete
+    },
+    { new: true })
 
-  todo.text = req.body.text
-  todo.save()
+  if (!todo) return res.status(404).send('The todo was not found')
   return res.json(todo)
 })
 
