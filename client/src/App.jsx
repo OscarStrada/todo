@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-const api_base = 'http://localhost:3000';
+const api_base = 'http://localhost:3000/api/todo';
 
 function App() {
 	const [todos, setTodos] = useState([]);
@@ -11,14 +11,14 @@ function App() {
 	}, []);
 
 	const GetTodos = () => {
-		fetch(api_base + '/todo')
+		fetch(api_base)
 			.then(res => res.json())
 			.then(data => setTodos(data))
 			.catch((err) => console.error("Error: ", err));
 	}
 
 	const completeTodo = async id => {
-		const data = await fetch(api_base + '/todo/complete/' + id).then(res => res.json());
+		const data = await fetch(api_base + '/complete/' + id).then(res => res.json());
 
 		setTodos(todos => todos.map(todo => {
 			if (todo._id === data._id) {
@@ -31,7 +31,7 @@ function App() {
 	}
 
 	const addTodo = async () => {
-		const data = await fetch(api_base + "/todo/new", {
+		const data = await fetch(api_base, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json" 
@@ -48,14 +48,14 @@ function App() {
 	}
 
 	const deleteTodo = async id => {
-		const data = await fetch(api_base + '/todo/delete/' + id, { method: "DELETE" }).then(res => res.json());
+		const data = await fetch(api_base + id, { method: "DELETE" }).then(res => res.json());
 
 		setTodos(todos => todos.filter(todo => todo._id !== data.result._id));
 	}
 
 	return (
 		<div className="App">
-			<h1>Welcome, Tyler</h1>
+			<h1>Welcome</h1>
 			<h4>Your tasks</h4>
 
 			<div className="todos">
